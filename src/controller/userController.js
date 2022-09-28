@@ -33,6 +33,7 @@ const userController = {
         }
     },
     login :  async function (req, res) {
+        console.log(req.session.email)
       const {Email, Possword}  = req.body
       const user = await User.findOne({Email : Email})
       if(user && (await bcrypt.compare(Possword, user.Possword))){
@@ -42,6 +43,8 @@ const userController = {
                 expiresIn : "2h"
             })
            res.status(200).json({user: user, token :token})
+           req.session.role = user.Role
+           console.log(req.session.role)
       }else{
           res.status(410).json({message : "wrong Creditials."})
       }

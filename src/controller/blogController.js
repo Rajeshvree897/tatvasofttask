@@ -5,10 +5,10 @@ const blogController = {
           try{
           console.log(req.body);
             if(req.body.email){
-                console.log('f');
                 const existUser = await User.findOne({Email : req.body.email})
                 if(existUser){
-                    const blogData = new Blog(req.body)
+                    const blogObj = new Blog(req.body)
+                     const blogData = await blogObj.save();
                     if(blogData){
                         res.status(200).json(blogData)
                     }else{
@@ -18,23 +18,17 @@ const blogController = {
                     res.status(410).json({message : "User Doesn't exist"})
                 }
             }
-        }catch{
+        }catch(err){
             res.status(500).json(err)
         }
-    },
-    allBlogs : async function (req, res) {
-        try{
-        const allBlogs  = await Blog.find()
-        res.status(200).json(allBlogs)
-         }catch(err) {
-             res.status(400).send(err)
-         }
     },
     blogsFilter : async function (req, res) {
         try{
         const searchBy = req.params.key
-        const value = searchBy.value
-        const blogData  = await Blog.find({searchBy: value })
+        const value = req.params.value
+        let search = {}
+        search[searchBy] = value 
+        const blogData  = await Blog.find(search)
         res.status(200).json(blogData)
          }catch(err) {
              res.status(400).send(err)
